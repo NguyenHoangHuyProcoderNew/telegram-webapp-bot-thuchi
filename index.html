@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thêm Giao Dịch</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #999);
+        }
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--tg-theme-text-color, #000);
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 10px;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            color: var(--tg-theme-text-color, #000);
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--tg-theme-button-color, #3390ec);
+        }
+        .radio-group {
+            display: flex;
+            gap: 10px;
+        }
+        .radio-option {
+            flex: 1;
+            position: relative;
+        }
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+        }
+        .radio-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border: 2px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .radio-option input:checked + label {
+            border-color: var(--tg-theme-button-color, #3390ec);
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #fff);
+        }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        .error {
+            color: #ff3b30;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .hint {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #999);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Thêm Giao Dịch Mới</h1>
+        <p>Nhập đầy đủ thông tin bên dưới</p>
+    </div>
+
+    <form id="transactionForm">
+        <div class="form-group">
+            <label>📋 Nội dung giao dịch</label>
+            <input type="text" id="noidung" placeholder="VD: Thu tiền phòng 101" required>
+            <div class="error" id="noidung-error">Vui lòng nhập nội dung</div>
+        </div>
+
+        <div class="form-group">
+            <label>💰 Số tiền (VNĐ)</label>
+            <input type="number" id="sotien" placeholder="VD: 500000" required min="1">
+            <div class="hint">Chỉ nhập số, không có dấu phẩy</div>
+            <div class="error" id="sotien-error">Vui lòng nhập số tiền hợp lệ</div>
+        </div>
+
+        <div class="form-group">
+            <label>🔄 Loại giao dịch</label>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <input type="radio" id="thu" name="loai" value="Thu" required>
+                    <label for="thu">💰 Thu</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="chi" name="loai" value="Chi">
+                    <label for="chi">💸 Chi</label>
+                </div>
+            </div>
+            <div class="error" id="loai-error">Vui lòng chọn loại giao dịch</div>
+        </div>
+
+        <div class="form-group">
+            <label>💳 Hình thức thanh toán</label>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <input type="radio" id="tienmat" name="hinhthuc" value="Tiền mặt" required>
+                    <label for="tienmat">💵 Tiền mặt</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="chuyenkhoan" name="hinhthuc" value="Chuyển khoản">
+                    <label for="chuyenkhoan">🏦 Chuyển khoản</label>
+                </div>
+            </div>
+            <div class="error" id="hinhthuc-error">Vui lòng chọn hình thức</div>
+        </div>
+
+        <div class="form-group">
+            <label>📂 Loại thu chi</label>
+            <select id="loaithuchi" required>
+                <option value="">-- Chọn loại thu chi --</option>
+                <option value="Thu tiền khách trả">Thu tiền khách trả</option>
+                <option value="Khoản thu khác">Khoản thu khác</option>
+                <option value="Giao dịch chuyển tiền nội bộ">Giao dịch chuyển tiền nội bộ</option>
+                <option value="Chi tiêu khác">Chi tiêu khác</option>
+                <option value="Mua đồ dùng trong nhà nghỉ">Mua đồ dùng trong nhà nghỉ</option>
+                <option value="Trả lương nhân viên">Trả lương nhân viên</option>
+                <option value="Đóng Hụi Cô Phượng">Đóng Hụi Cô Phượng</option>
+                <option value="Mẹ chi tiêu">Mẹ chi tiêu</option>
+                <option value="Đức chi tiêu">Đức chi tiêu</option>
+                <option value="Huy chi tiêu">Huy chi tiêu</option>
+                <option value="Chi phí sửa chữa">Chi phí sửa chữa</option>
+                <option value="Tiền điện">Tiền điện</option>
+                <option value="Tiền nước">Tiền nước</option>
+                <option value="Tiền wifi">Tiền wifi</option>
+            </select>
+            <div class="error" id="loaithuchi-error">Vui lòng chọn loại thu chi</div>
+        </div>
+
+        <div class="form-group">
+            <label>👤 Người nhập</label>
+            <select id="nguoinhap" required>
+                <option value="">-- Chọn người nhập --</option>
+                <option value="NGUYỄN HOÀNG HUY">NGUYỄN HOÀNG HUY</option>
+                <option value="NGUYỄN KHÁNH ĐỨC">NGUYỄN KHÁNH ĐỨC</option>
+            </select>
+            <div class="error" id="nguoinhap-error">Vui lòng chọn người nhập</div>
+        </div>
+    </form>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.setText('✅ XÁC NHẬN');
+        tg.MainButton.show();
+
+        function validateForm() {
+            let isValid = true;
+            document.querySelectorAll('.error').forEach(e => e.classList.remove('show'));
+
+            const noidung = document.getElementById('noidung').value.trim();
+            const sotien = document.getElementById('sotien').value;
+            const loai = document.querySelector('input[name="loai"]:checked');
+            const hinhthuc = document.querySelector('input[name="hinhthuc"]:checked');
+            const loaithuchi = document.getElementById('loaithuchi').value;
+            const nguoinhap = document.getElementById('nguoinhap').value;
+
+            if (!noidung) {
+                document.getElementById('noidung-error').classList.add('show');
+                isValid = false;
+            }
+            if (!sotien || parseInt(sotien) <= 0) {
+                document.getElementById('sotien-error').classList.add('show');
+                isValid = false;
+            }
+            if (!loai) {
+                document.getElementById('loai-error').classList.add('show');
+                isValid = false;
+            }
+            if (!hinhthuc) {
+                document.getElementById('hinhthuc-error').classList.add('show');
+                isValid = false;
+            }
+            if (!loaithuchi) {
+                document.getElementById('loaithuchi-error').classList.add('show');
+                isValid = false;
+            }
+            if (!nguoinhap) {
+                document.getElementById('nguoinhap-error').classList.add('show');
+                isValid = false;
+            }
+            return isValid;
+        }
+
+        function submitForm() {
+            if (!validateForm()) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+
+            const data = {
+                noidung: document.getElementById('noidung').value.trim(),
+                sotien: parseInt(document.getElementById('sotien').value),
+                loai: document.querySelector('input[name="loai"]:checked').value,
+                hinhthuc: document.querySelector('input[name="hinhthuc"]:checked').value,
+                loaithuchi: document.getElementById('loaithuchi').value,
+                nguoinhap: document.getElementById('nguoinhap').value
+            };
+
+            tg.sendData(JSON.stringify(data));
+        }
+
+        tg.MainButton.onClick(submitForm);
+        tg.ready();
+    </script>
+</body>
+</html>
+

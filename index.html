@@ -115,14 +115,39 @@
     <form id="transactionForm">
         <div class="form-group">
             <label>📋 Nội dung giao dịch</label>
-            <input type="text" id="noidung" placeholder="VD: Thu tiền phòng 101" required>
+            <input type="text" id="noidung" list="noidung-list" placeholder="Chọn hoặc nhập nội dung..." required>
+            <datalist id="noidung-list">
+                <option value="Thu tiền khách giờ phòng 3 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 3 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 4 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 4 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 5 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 5 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 7 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 7 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 8 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 8 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 9 nhà cũ">
+                <option value="Thu tiền khách qua đêm phòng 9 nhà cũ">
+                <option value="Thu tiền khách giờ phòng 1 nhà mới">
+                <option value="Thu tiền khách qua đêm phòng 1 nhà mới">
+                <option value="Thu tiền khách giờ phòng 2 nhà mới">
+                <option value="Thu tiền khách qua đêm phòng 2 nhà mới">
+                <option value="Thu tiền khách giờ phòng 3 nhà mới">
+                <option value="Thu tiền khách qua đêm phòng 3 nhà mới">
+                <option value="Thu tiền khách giờ phòng 4 nhà mới">
+                <option value="Thu tiền khách qua đêm phòng 4 nhà mới">
+                <option value="Thu tiền khách giờ phòng 5 nhà mới">
+                <option value="Thu tiền khách qua đêm phòng 5 nhà mới">
+            </datalist>
+            <div class="hint">Chọn từ danh sách hoặc nhập tự do</div>
             <div class="error" id="noidung-error">Vui lòng nhập nội dung</div>
         </div>
 
         <div class="form-group">
             <label>💰 Số tiền (VNĐ)</label>
-            <input type="number" id="sotien" placeholder="VD: 500000" required min="1">
-            <div class="hint">Chỉ nhập số, không có dấu phẩy</div>
+            <input type="text" id="sotien" inputmode="numeric" placeholder="VD: 500,000" required>
+            <div class="hint">Tự động thêm dấu phẩy phân cách hàng nghìn</div>
             <div class="error" id="sotien-error">Vui lòng nhập số tiền hợp lệ</div>
         </div>
 
@@ -130,7 +155,7 @@
             <label>🔄 Loại giao dịch</label>
             <div class="radio-group">
                 <div class="radio-option">
-                    <input type="radio" id="thu" name="loai" value="Thu" required>
+                    <input type="radio" id="thu" name="loai" value="Thu" checked required>
                     <label for="thu">💰 Thu</label>
                 </div>
                 <div class="radio-option">
@@ -145,7 +170,7 @@
             <label>💳 Hình thức thanh toán</label>
             <div class="radio-group">
                 <div class="radio-option">
-                    <input type="radio" id="tienmat" name="hinhthuc" value="Tiền mặt" required>
+                    <input type="radio" id="tienmat" name="hinhthuc" value="Tiền mặt" checked required>
                     <label for="tienmat">💵 Tiền mặt</label>
                 </div>
                 <div class="radio-option">
@@ -159,8 +184,7 @@
         <div class="form-group">
             <label>📂 Loại thu chi</label>
             <select id="loaithuchi" required>
-                <option value="">-- Chọn loại thu chi --</option>
-                <option value="Thu tiền khách trả">Thu tiền khách trả</option>
+                <option value="Thu tiền khách trả" selected>Thu tiền khách trả</option>
                 <option value="Khoản thu khác">Khoản thu khác</option>
                 <option value="Giao dịch chuyển tiền nội bộ">Giao dịch chuyển tiền nội bộ</option>
                 <option value="Chi tiêu khác">Chi tiêu khác</option>
@@ -181,8 +205,7 @@
         <div class="form-group">
             <label>👤 Người nhập</label>
             <select id="nguoinhap" required>
-                <option value="">-- Chọn người nhập --</option>
-                <option value="NGUYỄN HOÀNG HUY">NGUYỄN HOÀNG HUY</option>
+                <option value="NGUYỄN HOÀNG HUY" selected>NGUYỄN HOÀNG HUY</option>
                 <option value="NGUYỄN KHÁNH ĐỨC">NGUYỄN KHÁNH ĐỨC</option>
             </select>
             <div class="error" id="nguoinhap-error">Vui lòng chọn người nhập</div>
@@ -195,12 +218,42 @@
         tg.MainButton.setText('✅ XÁC NHẬN');
         tg.MainButton.show();
 
+        // ========== FORMAT SỐ TIỀN VỚI DẤU PHẨY ==========
+        const sotienInput = document.getElementById('sotien');
+
+        function formatNumber(num) {
+            // Loại bỏ tất cả ký tự không phải số
+            let value = num.replace(/[^\d]/g, '');
+            // Thêm dấu phẩy phân cách hàng nghìn
+            return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function getNumericValue(formattedStr) {
+            // Loại bỏ tất cả dấu phẩy để lấy số nguyên
+            return parseInt(formattedStr.replace(/,/g, '')) || 0;
+        }
+
+        sotienInput.addEventListener('input', function(e) {
+            // Lưu vị trí con trỏ
+            let cursorPos = this.selectionStart;
+            let oldLength = this.value.length;
+
+            // Format số
+            this.value = formatNumber(this.value);
+
+            // Điều chỉnh vị trí con trỏ
+            let newLength = this.value.length;
+            cursorPos = cursorPos + (newLength - oldLength);
+            this.setSelectionRange(cursorPos, cursorPos);
+        });
+        // ========== KẾT THÚC FORMAT SỐ TIỀN ==========
+
         function validateForm() {
             let isValid = true;
             document.querySelectorAll('.error').forEach(e => e.classList.remove('show'));
 
             const noidung = document.getElementById('noidung').value.trim();
-            const sotien = document.getElementById('sotien').value;
+            const sotien = getNumericValue(document.getElementById('sotien').value);
             const loai = document.querySelector('input[name="loai"]:checked');
             const hinhthuc = document.querySelector('input[name="hinhthuc"]:checked');
             const loaithuchi = document.getElementById('loaithuchi').value;
@@ -210,7 +263,7 @@
                 document.getElementById('noidung-error').classList.add('show');
                 isValid = false;
             }
-            if (!sotien || parseInt(sotien) <= 0) {
+            if (!sotien || sotien <= 0) {
                 document.getElementById('sotien-error').classList.add('show');
                 isValid = false;
             }
@@ -241,7 +294,7 @@
 
             const data = {
                 noidung: document.getElementById('noidung').value.trim(),
-                sotien: parseInt(document.getElementById('sotien').value),
+                sotien: getNumericValue(document.getElementById('sotien').value),
                 loai: document.querySelector('input[name="loai"]:checked').value,
                 hinhthuc: document.querySelector('input[name="hinhthuc"]:checked').value,
                 loaithuchi: document.getElementById('loaithuchi').value,
